@@ -54,33 +54,31 @@ void print_Euler_poly(int n) {
 bool cfHP_Y1_test(int n, int m, mpz_class E[], int N, bool p) {
     mpz_class a1[n];
     mpz_class a2[n];
-    mpz_class pi = 0;
+    mpz_class pi;
     mpz_class two = 2;
-    mpz_class two_pow, B0, B1, B2, B3;
+    mpz_class two_pow, B1, B2, B3;
     int a;
-    for(int r = 0; r < n; r++) {
-        B0 = 2*binomial(n - 1, r)*pow(-1, r % 2);
-        for(int k = 0; k < n; k++) {
-            a1[r] += binomial(m - 1, k)*B0;
-        }
-    }
-    for(int l = 1; l < n; l++) {
-        mpz_pow_ui(two_pow.get_mpz_t(), two.get_mpz_t(), uint32_t(l + 1));
-        B1 = binomial(m, l);
-        for(int k = 0; k < n - l; k++){
-            B2 = binomial(m - l - 1, k);
-            for(int r = 0; r < n - l; r++) {
-                B3 = pow(-1, r % 2)*binomial(n - l - 1, r);
-                for(int s = 0; s < l; s++) {
-                    a2[r + s + 1] += two_pow*B1*B2*B3*E[l*N + s];
-                }
-            }
-        }
-    }
     for(int k = 0; k < n; k++) {
         pi += binomial(m - 1, k);
     }
     pi *= 2;
+    for(int r = 0; r < n; r++) {
+        a1[r] += pi*binomial(n - 1, r)*pow(-1, r % 2);
+    }
+    for(int l = 1; l < n; l++) {
+        mpz_pow_ui(two_pow.get_mpz_t(), two.get_mpz_t(), uint32_t(l + 1));
+        B1 = two_pow*binomial(m, l);
+        for(int k = 0; k < n - l; k++){
+            B2 += binomial(m - l - 1, k);
+        }
+        B2 *= B1;
+        for(int r = 0; r < n - l; r++) {
+            B3 = B2*pow(-1, r % 2)*binomial(n - l - 1, r);
+            for(int s = 0; s < l; s++) {
+                a2[r + s + 1] += B3*E[l*N + s];
+            }
+        }
+    }
     if (p) {
         if(n == 1) {
             std::cout << "1\n";
@@ -97,8 +95,8 @@ bool cfHP_Y1_test(int n, int m, mpz_class E[], int N, bool p) {
             std::cout << a1[n - 1] + a2[n - 1] << "*T^" << n - 1 << "\n";
         }
     }
-    a = 0;
-    while(a < n) {
+    a = 1; // Know a = 0 and a = n - 1 are already pi-multiples.
+    while(a < n - 1) {
         if((a1[a] + a2[a]) % pi != 0) {
             return false;
         }
