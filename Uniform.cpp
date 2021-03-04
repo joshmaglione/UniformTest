@@ -68,6 +68,7 @@ bool cfHP_Y1_test(int n, int m, mpz_class E[], int N, bool p) {
     for(int l = 1; l < n; l++) {
         mpz_pow_ui(two_pow.get_mpz_t(), two.get_mpz_t(), uint32_t(l + 1));
         B1 = two_pow*binomial(m, l);
+        B2 = 0;
         for(int k = 0; k < n - l; k++){
             B2 += binomial(m - l - 1, k);
         }
