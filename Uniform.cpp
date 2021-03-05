@@ -106,6 +106,23 @@ bool cfHP_Y1_test(int n, int m, mpz_class E[], int N, bool p) {
     return true;
 }
 
+bool linear_term_test(int n, int m) {
+    mpz_class N, D, t, two_pow;
+    mpz_class two = 2;
+    for(int k = 0; k < n; k++) {
+        D += binomial(m - 1, k);
+    }
+    for(int l = 1; l < n; l++){
+        t = 0;
+        for(int k = 0; k < n - l; k++) {
+            t += binomial(m - l - 1, k);
+        }
+        mpz_pow_ui(two_pow.get_mpz_t(), two.get_mpz_t(), uint32_t(l));
+        N += two_pow*binomial(m, l)*t;
+    }
+    return (N % D == 0);
+}
+
 int main() {
     int A, B, n, m, dec;
     bool U;
@@ -147,21 +164,36 @@ int main() {
         std::cout << "=========================================================\n";
     }
     else {
-        std::cout << "n = ";
-        std::cin >> n;
-        std::cout << "m = ";
-        std::cin >> m;
-        // Build Euler table.
-        std::cout << "Building table with Eulerian numbers.\n";
-        mpz_class Euler[n*(n + 1)];
-        Euler[0] = 1;
-        for(int i = 0; i < n; i++) {
-            for(int j = 0; j < i; j++) {
-                Euler[i*n + j] = Euler_number(i, j);
+        if(dec >= 1){
+            std::cout << "n = ";
+            std::cin >> n;
+            std::cout << "m = ";
+            std::cin >> m;
+            // Build Euler table.
+            std::cout << "Building table with Eulerian numbers.\n";
+            mpz_class Euler[n*(n + 1)];
+            Euler[0] = 1;
+            for(int i = 0; i < n; i++) {
+                for(int j = 0; j < i; j++) {
+                    Euler[i*n + j] = Euler_number(i, j);
+                }
+            }
+            std::cout << "\n";
+            cfHP_Y1_test(n, m, Euler, n, true);
+        }
+        else {
+            std::cout << "n = ";
+            std::cin >> n;
+            std::cout << "m = ";
+            std::cin >> m;
+            for(int i = 4; i < n + 1; i++) {
+                for(int j = i + 1; j < m + 1; j++) {
+                    if(linear_term_test(i, j)) {
+                        std::cout << "---- (" << i << ", " << j << ")\n";
+                    }
+                }
             }
         }
-        std::cout << "\n";
-        cfHP_Y1_test(n, m, Euler, n, true);
     }
     return 0;
 }
